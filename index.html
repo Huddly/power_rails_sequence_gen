@@ -16,48 +16,33 @@
 
     <link rel="canonical" href="https://github.com/Lemon-zz/power_rails_sequence_gen">
 
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "Power-Up Designer",
-      "description": "A web-based utility for designing and exporting power-up and power-down timing sequences for hardware engineering.",
-      "applicationCategory": "DesignApplication, EngineeringTool",
-      "operatingSystem": "Any",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "featureList": [
-        "Dynamic Power-Up/Down Sequencing",
-        "Automatic Tn Marker Generation",
-        "Vector SVG Export",
-        "Datasheet Print Mode",
-        "Dependency Tracking"
-      ]
-    }
-    </script>
     <style>
         :root { --bg: #121212; --panel: #1e1e1e; --accent: #00e676; --text: #cfd8dc; --break: #ff9800; --down: #ff5252; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; overflow: hidden; }
-        .sidebar { width: 380px; background: var(--panel); border-right: 1px solid #333; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+        .sidebar { width: 380px; background: var(--panel); border-right: 1px solid #333; display: flex; flex-direction: column; padding: 15px; box-sizing: border-box; overflow-y: auto; }
         h2 { color: var(--accent); font-size: 1.1rem; margin: 0; border-bottom: 1px solid #333; padding-bottom: 10px; font-weight: 800; }
-        .item-card { background: #252525; border-radius: 6px; padding: 15px; margin-bottom: 12px; border-left: 4px solid var(--accent); position: relative; }
+        
+        /* Compact Card Styling */
+        .item-card { background: #252525; border-radius: 6px; padding: 8px 10px 10px 10px; margin-bottom: 8px; border-left: 4px solid var(--accent); position: relative; }
         .item-card.break { border-left-color: var(--break); }
-        label { display: block; font-size: 0.65rem; color: #888; margin-top: 10px; text-transform: uppercase; font-weight: bold; }
-        input, select { background: #333; border: 1px solid #444; color: white; padding: 8px; border-radius: 4px; width: 100%; box-sizing: border-box; font-family: monospace; margin-top: 4px; }
-        .remove-btn { position: absolute; top: 10px; right: 10px; background: #444; color: #ff5252; border: none; cursor: pointer; width: 22px; height: 22px; border-radius: 50%; font-weight: bold; }
+        label { display: block; font-size: 0.6rem; color: #888; margin-top: 6px; margin-bottom: 2px; text-transform: uppercase; font-weight: bold; }
+        input, select { background: #333; border: 1px solid #444; color: white; padding: 4px 6px; border-radius: 4px; width: 100%; box-sizing: border-box; font-family: monospace; font-size: 0.75rem; }
+        .remove-btn { position: absolute; top: 6px; right: 6px; background: #444; color: #ff5252; border: none; cursor: pointer; width: 20px; height: 20px; border-radius: 50%; font-weight: bold; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; padding: 0;}
+        
         .main { flex-grow: 1; background: #0a0a0a; overflow: auto; }
         #visualizer { display: block; }
-        .btn-group { display: flex; gap: 8px; margin-top: 10px; position: sticky; bottom: 0; background: var(--panel); padding-top: 10px; flex-wrap: wrap; }
-        button { border: none; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; flex: 1 1 45%; font-size: 0.75rem; }
+        .btn-group { display: flex; gap: 6px; margin-top: 10px; position: sticky; bottom: 0; background: var(--panel); padding-top: 10px; flex-wrap: wrap; }
+        button { border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold; flex: 1 1 45%; font-size: 0.75rem; }
         .btn-rail { background: var(--accent); color: #000; }
         .btn-break { background: var(--break); color: #000; }
         .btn-clone { background: #9c27b0; color: white; flex: 1 1 100%; }
         .btn-export { background: #2196f3; color: white; flex: 1 1 100%; }
-        .toggle-container { background: #2d2d2d; padding: 10px; border-radius: 6px; margin-bottom: 8px; border: 1px solid #444; display: flex; align-items: center; gap: 12px; font-size: 0.75rem; cursor: pointer; }
-        .mode-indicator { font-weight: 900; padding: 6px; border-radius: 4px; margin: 10px 0; text-align: center; font-size: 0.8rem; }
+        .btn-save { background: #00b0ff; color: #000; flex: 1 1 45%; }
+        .btn-load { background: #ffb300; color: #000; flex: 1 1 45%; }
+        #configFileName { flex: 1 1 100%; text-align: center; font-weight: bold; font-size: 0.8rem; margin-top: 4px; margin-bottom: 2px; color: #fff; background: #2d2d2d; border: 1px solid #555; padding: 6px; }
+        #configFileName:focus { border-color: #00b0ff; outline: none; }
+        .toggle-container { background: #2d2d2d; padding: 8px; border-radius: 6px; margin-bottom: 6px; border: 1px solid #444; display: flex; align-items: center; gap: 12px; font-size: 0.75rem; cursor: pointer; }
+        .mode-indicator { font-weight: 900; padding: 6px; border-radius: 4px; margin: 10px 0 6px 0; text-align: center; font-size: 0.8rem; }
         .up { background: rgba(0, 230, 118, 0.15); color: var(--accent); border: 1px solid var(--accent); }
         .down { background: rgba(255, 82, 82, 0.15); color: var(--down); border: 1px solid var(--down); }
     </style>
@@ -82,6 +67,12 @@
     <div class="btn-group">
         <button class="btn-rail" onclick="addItem('rail')">+ RAIL</button>
         <button class="btn-break" onclick="addItem('break')">+ BREAK</button>
+        
+        <input type="text" id="configFileName" value="Randomfish_A1.json" title="Config File Name" />
+        
+        <button class="btn-save" onclick="saveConfig()">💾 SAVE CONFIG</button>
+        <input type="file" id="configFile" accept=".json" style="display: none;" onchange="loadConfig(event)">
+        <button class="btn-load" onclick="document.getElementById('configFile').click()">📂 LOAD CONFIG</button>
         <button class="btn-clone" onclick="cloneToPowerDown()">🔄 CLONE TO POWER DOWN</button>
         <button class="btn-export" onclick="exportSVG()">💾 EXPORT TO SVG</button>
     </div>
@@ -91,10 +82,69 @@
 
 <script>
     let sequence = [
-        { type: 'rail', id: 'r1', name: '12V_VIN', delay: 0, rise: 5, color: '#4fc3f7', parentId: 'none' },
-        { type: 'rail', id: 'r2', name: '3V3_SYS', delay: 20, rise: 10, color: '#81c784', parentId: 'r1' },
-        { type: 'rail', id: 'r3', name: '1V8_CORE', delay: 15, rise: 8, color: '#ffb74d', parentId: 'r2' }
+        { type: 'rail', id: 'r1', name: '12V_VIN', delay: 0, rise: 5, color: '#4fc3f7', parentId: 'none', triggerPct: 100, addDelay: 0 },
+        { type: 'rail', id: 'r2', name: '3V3_SYS', delay: 20, rise: 10, color: '#81c784', parentId: 'r1', triggerPct: 100, addDelay: 0 },
+        { type: 'rail', id: 'r3', name: '1V8_CORE', delay: 15, rise: 8, color: '#ffb74d', parentId: 'r2', triggerPct: 100, addDelay: 0 }
     ];
+
+    function saveConfig() {
+        const configData = {
+            version: "1.1",
+            settings: {
+                isPowerDownMode: document.getElementById('powerDownMode').checked,
+                isBWMode: document.getElementById('datasheetMode').checked
+            },
+            sequence: sequence
+        };
+
+        const jsonString = JSON.stringify(configData, null, 4);
+        const blob = new Blob([jsonString], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        
+        let filename = document.getElementById('configFileName').value.trim();
+        if (!filename) filename = "Randomfish_A1.json"; 
+        if (!filename.toLowerCase().endsWith('.json')) filename += ".json"; 
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function loadConfig(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const loadedData = JSON.parse(e.target.result);
+                
+                if (loadedData && Array.isArray(loadedData.sequence)) {
+                    sequence = loadedData.sequence;
+                    
+                    if (loadedData.settings) {
+                        document.getElementById('powerDownMode').checked = !!loadedData.settings.isPowerDownMode;
+                        document.getElementById('datasheetMode').checked = !!loadedData.settings.isBWMode;
+                    }
+                    
+                    document.getElementById('configFileName').value = file.name;
+
+                    toggleMode(); 
+                    updateUI();
+                } else {
+                    alert("Invalid configuration file. Could not find sequence array.");
+                }
+            } catch (error) {
+                alert("Error reading file. Please ensure it is a valid JSON document.");
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    }
 
     function toggleMode() {
         const isDown = document.getElementById('powerDownMode').checked;
@@ -105,11 +155,8 @@
     }
 
     function cloneToPowerDown() {
-        // 1. Filter only rails
         let railsOnly = sequence.filter(i => i.type === 'rail');
-        // 2. Reverse them (Last UP is usually First DOWN)
         railsOnly.reverse();
-        // 3. Rebuild parents to maintain the chain in reverse
         let newSequence = [];
         railsOnly.forEach((rail, index) => {
             newSequence.push({
@@ -128,7 +175,7 @@
         const id = 'id' + Math.random().toString(36).substr(2, 5);
         if (type === 'rail') {
             const last = sequence.filter(r => r.type === 'rail').pop();
-            sequence.push({ type: 'rail', id, name: 'NEW_RAIL', delay: 10, rise: 5, color: '#ba68c8', parentId: last ? last.id : 'none' });
+            sequence.push({ type: 'rail', id, name: 'NEW_RAIL', delay: 10, rise: 5, color: '#ba68c8', parentId: last ? last.id : 'none', triggerPct: 100, addDelay: 0 });
         } else {
             sequence.push({ type: 'break', id, duration: 200, visualWidth: 40 });
         }
@@ -143,7 +190,11 @@
     function updateVal(id, key, val, needsUIUpdate = false) {
         const item = sequence.find(i => i.id === id);
         if (item) {
-            item[key] = (typeof item[key] === 'string') ? val : (parseFloat(val) || 0);
+            if (key === 'name' || key === 'parentId' || key === 'color') {
+                item[key] = val;
+            } else {
+                item[key] = parseFloat(val) || 0; 
+            }
             if (needsUIUpdate) updateUI(); else render();
         }
     }
@@ -152,26 +203,52 @@
         const list = document.getElementById('itemList');
         list.innerHTML = '';
         const railOptions = sequence.filter(i => i.type === 'rail');
+        
         sequence.forEach(item => {
             const card = document.createElement('div');
             card.className = `item-card ${item.type}`;
+            
             if (item.type === 'rail') {
                 let options = `<option value="none">None (Start 0)</option>`;
                 railOptions.forEach(r => { if (r.id !== item.id) options += `<option value="${r.id}" ${item.parentId === r.id ? 'selected' : ''}>${r.name}</option>`; });
-                card.innerHTML = `<button class="remove-btn" onclick="removeItem('${item.id}')">✕</button>
-                    <input type="text" value="${item.name}" oninput="updateVal('${item.id}', 'name', this.value)">
-                    <div style="display:flex;gap:5px">
-                        <div style="flex:1"><label>Delay</label><input type="number" value="${item.delay}" oninput="updateVal('${item.id}', 'delay', this.value)"></div>
+                
+                let tPct = item.triggerPct !== undefined ? item.triggerPct : 100;
+                let aDly = item.addDelay !== undefined ? item.addDelay : 0;
+
+                card.innerHTML = `
+                    <button class="remove-btn" onclick="removeItem('${item.id}')">✕</button>
+                    
+                    <input type="text" value="${item.name}" oninput="updateVal('${item.id}', 'name', this.value)" style="width: calc(100% - 24px); margin-top:0;">
+                    
+                    <div style="display:flex;gap:5px;">
+                        <div style="flex:1"><label>Base Delay</label><input type="number" value="${item.delay}" oninput="updateVal('${item.id}', 'delay', this.value)"></div>
                         <div style="flex:1"><label>Fall/Rise</label><input type="number" value="${item.rise}" oninput="updateVal('${item.id}', 'rise', this.value)"></div>
                     </div>
-                    <label>Trigger Parent</label><select onchange="updateVal('${item.id}', 'parentId', this.value, true)">${options}</select>`;
+                    
+                    <div style="display:flex;gap:5px;">
+                        <div style="flex:2">
+                            <label>Trigger Parent</label>
+                            <select onchange="updateVal('${item.id}', 'parentId', this.value, true)">${options}</select>
+                        </div>
+                        <div style="flex:1">
+                            <label>Trig %</label>
+                            <input type="number" min="0" max="100" value="${tPct}" oninput="updateVal('${item.id}', 'triggerPct', this.value)">
+                        </div>
+                        <div style="flex:1">
+                            <label>Add. Dly</label>
+                            <input type="number" value="${aDly}" oninput="updateVal('${item.id}', 'addDelay', this.value)">
+                        </div>
+                    </div>
+                `;
             } else {
-                card.innerHTML = `<button class="remove-btn" onclick="removeItem('${item.id}')">✕</button>
-                    <div style="font-weight:bold; color:var(--break); font-size:0.7rem">TIME BREAK</div>
+                card.innerHTML = `
+                    <button class="remove-btn" onclick="removeItem('${item.id}')">✕</button>
+                    <div style="font-weight:bold; color:var(--break); font-size:0.75rem; margin-top:2px;">TIME BREAK</div>
                     <div style="display:flex;gap:5px">
                         <div style="flex:1"><label>ms</label><input type="number" value="${item.duration}" oninput="updateVal('${item.id}', 'duration', this.value)"></div>
                         <div style="flex:1"><label>px</label><input type="number" value="${item.visualWidth}" oninput="updateVal('${item.id}', 'visualWidth', this.value)"></div>
-                    </div>`;
+                    </div>
+                `;
             }
             list.appendChild(card);
         });
@@ -188,7 +265,11 @@
             text: isBW ? "#333" : "#888", 
             arrow: isBW ? "#444" : (isDown ? "#ff5252" : "#ffea00"), 
             marker: isBW ? "#bbb" : "#333", 
-            markerText: isBW ? "#000" : (isDown ? "#ff5252" : "#00e676") 
+            markerText: isBW ? "#000" : (isDown ? "#ff5252" : "#00e676"),
+            grid: isBW ? "#e0e0e0" : "#1f1f1f",
+            axis: isBW ? "#888" : "#555",
+            gridText: isBW ? "#555" : "#666",
+            totalTime: isBW ? "#555" : "#29b6f6" 
         };
 
         svg.style.background = colors.bg;
@@ -201,6 +282,7 @@
         let maxReachedX = X_OFF;
 
         let railIndex = 0;
+        
         sequence.forEach((item) => {
             if (item.type === 'break') {
                 breakList.push({ x: globalTimelineX, width: item.visualWidth, ms: item.duration });
@@ -208,21 +290,109 @@
             } else {
                 const y = (railIndex + 1) * LANE_H + 50;
                 let anchorX = globalTimelineX;
-                if (item.parentId !== 'none' && railGeometries[item.parentId]) anchorX = railGeometries[item.parentId].end;
-                const start = anchorX + (item.delay * SCALE);
+                
+                let tPct = item.triggerPct !== undefined ? item.triggerPct : 100;
+                let aDly = item.addDelay !== undefined ? item.addDelay : 0;
+                
+                if (item.parentId !== 'none' && railGeometries[item.parentId]) {
+                    const parent = railGeometries[item.parentId];
+                    if (isDown) {
+                        anchorX = parent.start + (parent.end - parent.start) * ((100 - tPct) / 100);
+                    } else {
+                        anchorX = parent.start + (parent.end - parent.start) * (tPct / 100);
+                    }
+                }
+                
+                const totalDelay = item.delay + aDly;
+                const start = anchorX + (totalDelay * SCALE);
                 const end = start + (item.rise * SCALE);
                 
-                railGeometries[item.id] = { y, start, end, name: item.name, color: isBW ? "#000" : item.color, anchorX, delay: item.delay, parentId: item.parentId };
+                railGeometries[item.id] = { 
+                    y, start, end, name: item.name, color: isBW ? "#000" : item.color, 
+                    anchorX, delay: item.delay, addDelay: aDly, totalDelay: totalDelay, 
+                    parentId: item.parentId, triggerPct: tPct 
+                };
                 globalTimelineX = end;
                 maxReachedX = Math.max(maxReachedX, end);
                 railIndex++;
             }
         });
 
-        const totalWidth = maxReachedX + 250;
+        const totalWidth = maxReachedX + 150;
         const totalHeight = (railIndex + 1) * LANE_H + 50;
         svg.setAttribute('width', totalWidth);
         svg.setAttribute('height', totalHeight);
+
+        let sortedBreaks = [...breakList].sort((a, b) => a.x - b.x);
+        
+        function getLogicalTime(xPos) {
+            let logicalAccum = 0;
+            let currentX = X_OFF;
+            for (let b of sortedBreaks) {
+                if (xPos <= b.x) return logicalAccum + (xPos - currentX) / SCALE;
+                logicalAccum += (b.x - currentX) / SCALE + b.ms;
+                currentX = b.x + b.width;
+            }
+            return logicalAccum + (xPos - currentX) / SCALE;
+        }
+
+        function getPhysicalX(timeMs) {
+            let logicalAccum = 0;
+            let currentX = X_OFF;
+            for (let b of sortedBreaks) {
+                let segmentLogicalWidth = (b.x - currentX) / SCALE;
+                if (timeMs <= logicalAccum + segmentLogicalWidth) {
+                    return currentX + (timeMs - logicalAccum) * SCALE;
+                }
+                if (timeMs < logicalAccum + segmentLogicalWidth + b.ms) {
+                    return null; 
+                }
+                logicalAccum += segmentLogicalWidth + b.ms;
+                currentX = b.x + b.width;
+            }
+            return currentX + (timeMs - logicalAccum) * SCALE;
+        }
+
+        let maxLogicalTime = getLogicalTime(totalWidth);
+        const targetMs = 80 / SCALE; 
+        const magnitude = Math.pow(10, Math.floor(Math.log10(targetMs)));
+        const val = targetMs / magnitude;
+        
+        let tickMs;
+        if (val < 1.5) tickMs = 1 * magnitude;
+        else if (val < 3.5) tickMs = 2 * magnitude;
+        else if (val < 7.5) tickMs = 5 * magnitude;
+        else tickMs = 10 * magnitude;
+
+        let bgHtml = `<line x1="${X_OFF}" y1="30" x2="${totalWidth}" y2="30" stroke="${colors.axis}" stroke-width="2" />`;
+        for (let t = 0; t <= maxLogicalTime; t += tickMs) {
+            t = Math.round(t * 1000) / 1000;
+            let px = getPhysicalX(t);
+            if (px !== null) {
+                bgHtml += `<line x1="${px}" y1="30" x2="${px}" y2="${totalHeight}" stroke="${colors.grid}" stroke-width="1" />`;
+                bgHtml += `<line x1="${px}" y1="26" x2="${px}" y2="34" stroke="${colors.axis}" stroke-width="2" />`;
+                bgHtml += `<text x="${px}" y="20" fill="${colors.gridText}" font-size="11" text-anchor="middle" font-family="monospace">${t}ms</text>`;
+            }
+        }
+        svg.innerHTML += bgHtml;
+
+        if (Object.keys(railGeometries).length > 0) {
+            let minX = Infinity;
+            let maxX = X_OFF;
+            Object.values(railGeometries).forEach(g => {
+                if (g.start < minX) minX = g.start;
+                if (g.end > maxX) maxX = g.end;
+            });
+
+            if (minX !== Infinity) {
+                let totalLogicalTime = getLogicalTime(maxX) - getLogicalTime(minX);
+                totalLogicalTime = Math.round(totalLogicalTime * 100) / 100;
+
+                svg.innerHTML += `<line x1="${minX}" y1="65" x2="${minX}" y2="${totalHeight - 20}" stroke="${colors.totalTime}" stroke-width="1.5" stroke-dasharray="2,3" opacity="0.6"/>`;
+                svg.innerHTML += `<line x1="${maxX}" y1="65" x2="${maxX}" y2="${totalHeight - 20}" stroke="${colors.totalTime}" stroke-width="1.5" stroke-dasharray="2,3" opacity="0.6"/>`;
+                drawArrow(svg, minX, maxX, 75, `TOTAL TIME: ${totalLogicalTime}ms`, colors.totalTime);
+            }
+        }
 
         Object.values(railGeometries).forEach((g, i) => drawGlobalMarker(svg, g.start, totalHeight, `T${i}`, colors.marker, colors.markerText));
 
@@ -236,48 +406,56 @@
             
             if (g.parentId !== 'none' && railGeometries[g.parentId]) {
                 const parent = railGeometries[g.parentId];
-                const yF = isDown ? parent.y : parent.y - 40;
+                const yF = parent.y - 40 * (g.triggerPct / 100);
                 const yT = isDown ? g.y - 40 : g.y - 15;
+                
                 svg.innerHTML += `<line x1="${g.anchorX}" y1="${yF}" x2="${g.anchorX}" y2="${yT}" stroke="${colors.arrow}" stroke-width="1" stroke-dasharray="3,3" opacity="0.6" />`;
+                svg.innerHTML += `<circle cx="${g.anchorX}" cy="${yF}" r="3" fill="${colors.arrow}" />`;
             }
-            if (g.delay > 0) drawArrow(svg, g.anchorX, g.start, isDown ? g.y-45 : g.y-15, `${g.delay}ms`, colors.arrow);
+            
+            if (g.totalDelay > 0) {
+                let arrowY = isDown ? g.y - 45 : g.y - 15;
+                
+                let delayText = (g.addDelay > 0 && g.delay > 0) ? `${g.delay}+${g.addDelay}ms` : `${g.totalDelay}ms`;
+                drawArrow(svg, g.anchorX, g.start, arrowY, delayText, colors.arrow);
+                
+                if (g.addDelay > 0 && g.delay > 0) {
+                    let splitPhysicalX = g.anchorX + (g.delay * SCALE);
+                    svg.innerHTML += `<line x1="${splitPhysicalX}" y1="${arrowY - 4}" x2="${splitPhysicalX}" y2="${arrowY + 4}" stroke="${colors.arrow}" stroke-width="2.5" />`;
+                }
+            }
         });
 
         breakList.forEach(b => drawCurvyBreak(svg, b.x, b.width, b.ms, totalHeight, colors.text, colors.bg));
     }
 
     function drawGlobalMarker(svg, x, h, label, col, txtCol) {
-        svg.innerHTML += `<line x1="${x}" y1="40" x2="${x}" y2="${h - 20}" stroke="${col}" stroke-width="1" stroke-dasharray="4,4" />`;
-        svg.innerHTML += `<text x="${x}" y="30" fill="${txtCol}" font-size="11" font-weight="bold" text-anchor="middle">${label}</text>`;
+        svg.innerHTML += `<line x1="${x}" y1="50" x2="${x}" y2="${h - 20}" stroke="${col}" stroke-width="1" stroke-dasharray="4,4" />`;
+        svg.innerHTML += `<text x="${x}" y="45" fill="${txtCol}" font-size="11" font-weight="bold" text-anchor="middle">${label}</text>`;
         svg.innerHTML += `<text x="${x}" y="${h - 5}" fill="${txtCol}" font-size="11" font-weight="bold" text-anchor="middle">${label}</text>`;
     }
 
-function drawCurvyBreak(svg, x, width, ms, height, color, bg) {
-    const midX = x + (width / 2);
-    const curve = width / 3, gap = width / 5;
-    
-    // 1. Clear the area behind the curves
-    svg.innerHTML += `<rect x="${x}" y="0" width="${width}" height="${height}" fill="${bg}" />`;
-    
-    const p = (off) => {
-        let d = `M ${off} 0`;
-        for (let y = 0; y < height; y += 100) d += ` C ${off + curve} ${y + 25}, ${off - curve} ${y + 75}, ${off} ${y + 100}`;
-        return d;
-    };
+    function drawCurvyBreak(svg, x, width, ms, height, color, bg) {
+        const midX = x + (width / 2);
+        const curve = width / 3, gap = width / 5;
+        
+        svg.innerHTML += `<rect x="${x}" y="0" width="${width}" height="${height}" fill="${bg}" />`;
+        
+        const p = (off) => {
+            let d = `M ${off} 0`;
+            for (let y = 0; y < height; y += 100) d += ` C ${off + curve} ${y + 25}, ${off - curve} ${y + 75}, ${off} ${y + 100}`;
+            return d;
+        };
 
-    // 2. Draw the Bezier curves
-    svg.innerHTML += `<path d="${p(midX-gap)}" stroke="${color}" stroke-width="2" fill="none" />
-                      <path d="${p(midX+gap)}" stroke="${color}" stroke-width="2" fill="none" />`;
-    
-    // 3. The Guard: Rectangle background for text readability
-    // We place this after the signal lines are drawn (which happens in the render loop)
-    // so it properly masks the signals passing through the break.
-    const textWidth = ms.toString().length * 8 + 20; // Dynamic width based on digits
-    svg.innerHTML += `
-        <rect x="${midX - (textWidth/2)}" y="35" width="${textWidth}" height="20" fill="${bg}" rx="4" />
-        <text x="${midX}" y="50" fill="${color}" font-size="12" font-weight="bold" text-anchor="middle" font-family="monospace">${ms}ms</text>
-    `;
-}
+        svg.innerHTML += `<path d="${p(midX-gap)}" stroke="${color}" stroke-width="2" fill="none" />
+                          <path d="${p(midX+gap)}" stroke="${color}" stroke-width="2" fill="none" />`;
+        
+        const textWidth = ms.toString().length * 8 + 20; 
+        svg.innerHTML += `
+            <rect x="${midX - (textWidth/2)}" y="45" width="${textWidth}" height="20" fill="${bg}" rx="4" />
+            <text x="${midX}" y="60" fill="${color}" font-size="12" font-weight="bold" text-anchor="middle" font-family="monospace">${ms}ms</text>
+        `;
+    }
 
     function drawArrow(svg, x1, x2, y, txt, col) {
         svg.innerHTML += `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${col}" stroke-width="1.5" />
@@ -290,9 +468,14 @@ function drawCurvyBreak(svg, x, width, ms, height, color, bg) {
         const svgData = new XMLSerializer().serializeToString(svgElement);
         const svgBlob = new Blob([svgData], {type: "image/svg+xml;charset=utf-8"});
         const svgUrl = URL.createObjectURL(svgBlob);
+        
+        let filename = document.getElementById('configFileName').value.trim();
+        if (!filename) filename = "Randomfish_A1";
+        filename = filename.replace(/\.json$/i, ".svg"); 
+        
         const downloadLink = document.createElement("a");
         downloadLink.href = svgUrl;
-        downloadLink.download = "power_sequence_export.svg";
+        downloadLink.download = filename;
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
@@ -300,24 +483,13 @@ function drawCurvyBreak(svg, x, width, ms, height, color, bg) {
 
     updateUI();
 </script>
-    <footer style="display:none;" aria-hidden="true">
+<footer style="display:none;" aria-hidden="true">
     <section>
         <h2>About Power-Up Designer</h2>
         <p>
-            The Power-Up Designer is a specialized **hardware engineering utility** designed to automate the creation of 
-            **voltage rail timing diagrams**. When designing complex PCB systems—especially those involving FPGAs, 
-            SoCs, or microcontrollers—engineers must strictly adhere to specific **power-on reset (POR)** and **power-down sequencing** requirements to prevent latch-up or hardware damage.
-        </p>
-        <p>
-            This tool replaces manual drawing in generic CAD software by providing a dynamic interface for:
-            <ul> power up sequence diagram online
-            </ul>
-            <ul> power down sequence diagram online
-            </ul>
-            <ul> power sequence online
-            </ul>
-            <ul> signal sequence diagram online
-            </ul>
+            The Power-Up Designer is a specialized hardware engineering utility designed to automate the creation of 
+            voltage rail timing diagrams. When designing complex PCB systems—especially those involving FPGAs, 
+            SoCs, or microcontrollers—engineers must strictly adhere to specific power-on reset (POR) and power-down sequencing requirements to prevent latch-up or hardware damage.
         </p>
     </section>
 </footer>
